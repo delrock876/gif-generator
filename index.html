@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="style.css">
+  <title>Gif Class Assignment</title>
+</head>
+
+<body>
+  <h1>Adult Cartoons</h1>
+
+  <!-- Div holds all current and to-be-created buttons -->
+  <div id="myBtns">
+
+    <button class="show" data-cartoon="Bojack Horseman">Bojack Horesman</button>
+    <button class="show" data-cartoon="Family Guy">Family Guy</button>
+
+  </div>
+
+  <!-- Input field and button to create new buttons -->
+  <input id="newcartoon" type="text"><button id="addcartoon">Submit</button>
+
+  <!-- Div where all gifs will be placed in -->
+  <div id="gifplace"></div>
+
+  <!-- Start Javascript -->
+  <script>
+
+    // event listener for the button with classname 'show'
+    document.addEventListener('click', event => {
+      if (event.target.className === 'show') {
+
+        //assigns the dataset value to the cartoon variable 
+        let cartoon = event.target.dataset.cartoon
+
+        //places the dataset value into the url using template literals 
+        let url = `https://api.giphy.com/v1/gifs/search?q=${cartoon}&api_key=3IqI9kYghbDyIOZrbC8yvy43VKp12FOU&limit=5`
+
+
+        //gives info about requests
+        fetch(url)
+
+          //returns actual data in the form of objects
+          .then(r => r.json())
+
+          // what you plan to do with data e.g. display it, print to console etc.
+          .then(gifs => {
+
+            //clears all gifs held in div
+            document.getElementById('gifplace').innerHTML = ' '
+
+            //loops through each item in returned data objects from your r.json() call
+            gifs.data.forEach(gif => {
+
+              //creates new image element on page 
+              let gifElem = document.createElement('img')
+
+              //gives the img source the url found in the object using that path 'images>original>url'
+              gifElem.src = gif.images.original_still.url
+
+              //gives gif still property with still url from object
+              gifElem.dataset.still = gif.images.original_still.url
+
+              //gifanimated
+              gifElem.dataset.animated = gif.images.original.url
+
+
+              //is animated
+              gifElem.dataset.isanimated = "false"
+
+              //sets class
+              gifElem.className = 'gif'
+
+              //adds the gif to the div where all gifs are held
+              document.getElementById('gifplace').append(gifElem)
+
+            })
+
+          })
+
+      } else if (event.target.className === 'gif') {
+        if (event.target.dataset.isanimated === "true") {
+          event.target.src = event.target.dataset.still
+          event.target.dataset.isanimated = "false"
+
+        } else {
+          event.target.src = event.target.dataset.animated
+          event.target.dataset.isanimated = "true"
+        }
+
+      }
+
+    })
+
+
+    // Handles Creating New Buttons for Gifs
+
+    //event listener for submit button
+    document.getElementById('addcartoon').addEventListener('click', e => {
+
+      //creates new button
+      let btnElem = document.createElement('button')
+
+      //assigns the text-input value to the button text
+      btnElem.innerHTML = document.getElementById('newcartoon').value
+
+      //assigns the new button the data-cartoon property the value of the text-input
+      btnElem.dataset.cartoon = document.getElementById('newcartoon').value
+
+      //assigns button class of 'show' (same as original buttons)
+      btnElem.className = 'show'
+
+      //adds new button to div where all buttons are held
+      document.getElementById('myBtns').append(btnElem)
+
+      //clears text-field 
+      document.getElementById('newcartoon').value = ' '
+    })
+
+
+
+
+
+  </script>
+</body>
+
+</html>
